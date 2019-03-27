@@ -1,3 +1,18 @@
+# 概要
+
+以下の作業をハンズオンで行います。
+
+1. Redmineをdockerイメージに固めてECSへデプロイします。
+2. AWS Pipelineを利用してRedmineのデプロイを行います。
+
+構成図は以下を確認してください。
+
+![ECS 構成図](images/Diagram01.jpg)
+
+![Pipeline 構成図](images/Diagram02.jpg)
+
+参考  
+https://www.farend.co.jp/blog/2019/02/jaws-days-2019/
 
 # 1. IAMユーザ登録
 
