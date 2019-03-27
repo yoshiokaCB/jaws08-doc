@@ -1,6 +1,7 @@
 
 # 1. IAMユーザ登録
 
+ユーザ作成後は credentialsファイルをダウンロードしてください。（ Access key ID と Secret access key を使用します。）
 
 ## ユーザ作成 その１
 
@@ -12,6 +13,8 @@
 - [プログラムによるアクセス]と[AWS マネジメントコンソールへのアクセス]にチェックを入れてください。
 - 以下のサイトを参考にして、CodeCommitにアクセスできるように認証をおこなってください。  
 https://docs.aws.amazon.com/ja_jp/codecommit/latest/userguide/setting-up-gc.html
+
+credentialsファイルをダウンロードして置いてください。
 
 ## ユーザ作成 その２
 
@@ -29,14 +32,14 @@ https://docs.aws.amazon.com/ja_jp/codecommit/latest/userguide/setting-up-gc.html
 https://docs.aws.amazon.com/ja_jp/streams/latest/dev/kinesis-tutorial-cli-installation.html
 
 
-# cloudformationの登録方法
+# 3. cloudformationの登録方法
 
 以下のページを参考にしてスタックを作成します。
 （CloudFormationを利用してvpc,s3,rdsを作成します）
 https://qiita.com/yoshiokaCB/private/7e126403cb4fb1258ceb
 
 
-# docker-compose ローカルで動作確認
+# 4. docker-compose ローカルで動作確認
 
 **ソースコードのダウンロード**
 
@@ -76,9 +79,9 @@ $ docker-compose up
 以下の `localhost:3000` へアクセスし、ログイン、プロジェクト作成、チケット作成を行い、チケット作成時にS3にファイルがアップロードされているか確認する。 （初期のログインID, Passwordは admin ）
 
 
-# ECSデプロイ
+# 5. ECSデプロイ
 
-## ECR（リポジトリ）の作成とアップロード
+## 5-1. ECR（リポジトリ）の作成とアップロード
 
 (1) サービスから「ECS」を選択し、左側にあるメニューから「リポジトリ」を選択します。
 
@@ -97,24 +100,24 @@ $ docker push [aws-acount-id].dkr.ecr.ap-northeast-1.amazonaws.com/[ecr-image-na
 上記手順でdocker image をプッシュしたらAWSでアップロードされていることを確認してください。
 
 
-## Application Load Balancer(ALB)の作成
+## 5-2. Application Load Balancer(ALB)の作成
 
 以下のページを参考にしてALBを作成します。
 
 「Application Load Balancer 作成手順」  
 https://qiita.com/yoshiokaCB/private/e2c75f31e65731b89bd0
 
-## TaskDefinitionの作成
+## 5-3. TaskDefinitionの作成
 
 「タスク定義（TaskDefinition） 作成手順」  
 https://qiita.com/yoshiokaCB/private/11b6e5ec559c238bacfe
 
 
-## クラスターの作成
+## 5-4. クラスターの作成
 
-## サービスの作成
+## 5-5. サービスの作成
 
 
 
-# Pipeline登録
+# 6. Pipeline登録
 
