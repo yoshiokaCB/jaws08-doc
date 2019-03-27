@@ -7,9 +7,11 @@
 
 構成図は以下を確認してください。
 
-![ECS 構成図](images/Diagram01.jpg)
+### ECS 構成図
+![ECS 構成図](images/Diagram01.jpeg)
 
-![Pipeline 構成図](images/Diagram02.jpg)
+### Pipeline 構成図
+![Pipeline 構成図](images/Diagram02.jpeg)
 
 参考  
 https://www.farend.co.jp/blog/2019/02/jaws-days-2019/
