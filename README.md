@@ -132,9 +132,40 @@ https://qiita.com/yoshiokaCB/private/11b6e5ec559c238bacfe
 
 ## 5-4. クラスターの作成
 
+「ECS クラスターの作成手順」  
+https://qiita.com/yoshiokaCB/private/e94b735216a2855eca33
+
 ## 5-5. サービスの作成
+
+「ECS サービスの設定手順」  
+https://qiita.com/yoshiokaCB/private/230340c0045d0439f87a
 
 
 
 # 6. Pipeline登録
+
+## 6-1. CodeCommitの作成
+
+## 6-2. CodeBuildの作成
+
+「CodeBuildの設定手順」  
+https://qiita.com/yoshiokaCB/private/b2b6e8927db46674f6df
+
+## 6-1. CodePipelineの作成
+
+「CodePipelineの設定手順」  
+https://qiita.com/yoshiokaCB/private/5e6e392f5aeffb7aeb91
+
+
+# 7. 後始末
+
+1. CodePipelineの削除
+1. ecsのサービスの削除
+1. ECSのタスクの削除
+1. ECSのクラスタの削除
+1. ALBのリスナーの削除
+1. ALBの削除
+1. ターゲットグループの削除
+1. Cloudformationのスタックの削除
+
 
