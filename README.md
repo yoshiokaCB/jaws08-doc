@@ -108,7 +108,7 @@ $ docker-compose up -d
 **[プッシュコマンドの表示]のサンプル**
 ```
 $ $(aws ecr get-login --no-include-email --region ap-northeast-1)
-$ docker tag [image-name]:latest [aws-acount-id].dkr.ecr.ap-northeast-1.amazonaws.com/[ecr-image-name]:latest
+$ docker tag redmine_app:latest [aws-acount-id].dkr.ecr.ap-northeast-1.amazonaws.com/[ecr-image-name]:latest
 $ docker push [aws-acount-id].dkr.ecr.ap-northeast-1.amazonaws.com/[ecr-image-name]:latest
 ```
 
