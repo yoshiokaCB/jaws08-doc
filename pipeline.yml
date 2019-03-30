@@ -1,0 +1,275 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  Cluster:
+    Type: String
+  Service:
+    Type: String
+
+  BaseImage:
+    Type: String
+    Default: 'aws/codebuild/ubuntu-base:14.04-1.5.0'
+  AwsAccountId:
+    Type: String
+  AwsDefaultRegion:
+    Type: String
+    Default: ap-northeast-1
+  EcrName:
+    Type: String
+    Default: 'redmine_app'
+  ContainerName:
+    Type: String
+    Default: 'redmine_container'
+
+  RepositoryName:
+    Type: String
+    Default: 'redmine_app'
+  BranchName:
+    Type: String
+    Default: 'aws/4.0-stable'
+
+Resources:
+  CodeBuildS3Policy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: CloudFormation Pipeline Execution Policy
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement: 
+          - Effect: Allow
+            Resource: 
+              - Fn::Sub: arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/redmine-build
+              - Fn::Sub: arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/redmine-build:*
+            Action: 
+              - "logs:CreateLogGroup"
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+          - Effect: Allow
+            Resource: 
+              - "arn:aws:s3:::codepipeline-ap-northeast-1-*"
+            Action: 
+              - "s3:PutObject"
+              - "s3:GetObject"
+              - "s3:GetObjectVersion"
+              - "s3:GetBucketAcl"
+              - "s3:GetBucketLocation"
+          - Effect: Allow
+            Resource: 
+              - Fn::Sub: arn:aws:codecommit:${AWS::Region}:${AWS::AccountId}:redmine_app
+            Action: 
+              - "codecommit:GitPull"
+
+
+  CodeBuildPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: CloudFormation Pipeline Execution Policy
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement: 
+          - Effect: Allow
+            Action: 
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeDhcpOptions"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+              - "ec2:DescribeSubnets"
+              - "ec2:DescribeSecurityGroups"
+              - "ec2:DescribeVpcs"
+            Resource: "*"
+          - Effect: Allow
+            Action: 
+              - "ec2:CreateNetworkInterfacePermission"
+            Resource: 
+              - Fn::Sub: arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*
+            Condition: 
+              StringEquals: 
+                "ec2:AuthorizedService": "codebuild.amazonaws.com"
+
+  CodeBuildRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole'
+        - 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser'
+        - 'arn:aws:iam::aws:policy/AdministratorAccess'
+        - !Ref CodeBuildPolicy
+        - !Ref CodeBuildS3Policy
+
+  PipelinePolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: CloudFormation Pipeline Execution Policy
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Effect: Allow
+          Action:
+            - 'cloudformation:CreateStack'
+            - 'cloudformation:DescribeStacks'
+            - 'cloudformation:DeleteStack'
+            - 'cloudformation:UpdateStack'
+            - 'cloudformation:CreateChangeSet'
+            - 'cloudformation:ExecuteChangeSet'
+            - 'cloudformation:DeleteChangeSet'
+            - 'cloudformation:DescribeChangeSet'
+            - 'cloudformation:SetStackPolicy'
+            - 'cloudformation:SetStackPolicy'
+            - 'cloudformation:ValidateTemplate'
+            - 'codebuild:StartBuild'
+            - 'codebuild:BatchGetBuilds'
+            - 'codedeploy:GetApplication'
+            - 'codedeploy:GetDeploymentGroup'
+            - 'codedeploy:ListApplications'
+            - 'codedeploy:ListDeploymentGroups'
+          Resource: '*'
+  PipelinelambdaPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: CloudFormation Pipeline Execution Policy
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Effect: Allow
+          Action:
+            - 'iam:PassRole'
+            - 'lambda:InvokeFunction'
+            - 'lambda:ListFunctions'
+            - 'lambda:InvokeAsyc'
+          Resource: '*'
+
+  PipelineExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+      Path: /
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AWSCodeCommitFullAccess'
+        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+        - 'arn:aws:iam::aws:policy/AWSCodePipelineFullAccess'
+        - 'arn:aws:iam::aws:policy/AWSCodeDeployFullAccess'
+        - 'arn:aws:iam::aws:policy/AmazonECS_FullAccess'
+        - !Ref PipelinePolicy
+        - !Ref PipelinelambdaPolicy
+
+
+  ArtifactBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      AccessControl: Private
+      LifecycleConfiguration:
+        Rules:
+          - NoncurrentVersionExpirationInDays: 30
+            Status: Enabled
+      VersioningConfiguration:
+        Status: Enabled
+
+  CodeBuildProject:
+    Description: Creating AWS CodeBuild project
+    Type: 'AWS::CodeBuild::Project'
+    Properties:
+      Artifacts:
+        Type: no_artifacts
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        PrivilegedMode: true
+        Image: !Ref BaseImage
+        EnvironmentVariables:
+          - Name: AWS_ACCOUNT_ID
+            Value: !Ref AwsAccountId
+          - Name: AWS_DEFAULT_REGION
+            Value: !Ref AwsDefaultRegion
+          - Name: IMAGE_NAME
+            Value: !Ref EcrName
+          - Name: CONTAINER_NAME
+            Value: !Ref ContainerName
+      Source:
+        Location: !Ref RepositoryName
+        Type: CODECOMMIT
+      Name: SaturnBuild
+      ServiceRole: !Ref CodeBuildRole
+      TimeoutInMinutes: 60
+
+  AppPipeline:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      ArtifactStore:
+        Type: S3
+        Location: !Ref ArtifactBucket
+      RoleArn: !GetAtt 
+        - PipelineExecutionRole
+        - Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: SourceAction
+              OutputArtifacts:
+                - Name: SourceOutput
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Version: '1'
+                Provider: CodeCommit
+              Configuration:
+                RepositoryName: !Ref RepositoryName
+                BranchName: !Ref BranchName
+              RunOrder: 1
+        - Name: Build
+          Actions:
+            - Name: BuildAction
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildArtif
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: '1'
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref CodeBuildProject
+              RunOrder: 2
+        - Name: Deploy
+          Actions:
+            - Name: DeployAction
+              InputArtifacts:
+                - Name: BuildArtif
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: ECS
+              Configuration:
+                FileName: imagedefinitions.json
+                ClusterName: !Ref Cluster
+                ServiceName: !Ref Service
+              RunOrder: 3
+
+
+Outputs:
+  AppPipeline:
+    Value: !Ref AppPipeline
+  PipelineExecutionRoleArn:
+    Value: !GetAtt [PipelineExecutionRole, Arn]
+  CodeBuildRole:
+    Value: !Ref CodeBuildRole

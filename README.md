@@ -102,13 +102,13 @@ $ docker-compose up
 
 (1) サービスから「ECS」を選択し、左側にあるメニューから「リポジトリ」を選択します。
 
-(2) 「リポジトリ作成」をクリックしECRのリポジトリーを作成します。（例：redmine_app）  
+(2) 「リポジトリ作成」をクリックしECRのリポジトリーを作成します。（redmine_app）  
 ローカル環境で作成されたredmineのイメージファイルと同じリポジトリ名にしておくと、「プッシュコマンドの表示」と同じ手順で登録できます。
 
 **[プッシュコマンドの表示]のサンプル**
 ```
 $ $(aws ecr get-login --no-include-email --region ap-northeast-1)
-$ docker tag [image-name]:latest [aws-acount-id].dkr.ecr.ap-northeast-1.amazonaws.com/[ecr-image-name]:latest
+$ docker tag redmine_app:latest [aws-acount-id].dkr.ecr.ap-northeast-1.amazonaws.com/[ecr-image-name]:latest
 $ docker push [aws-acount-id].dkr.ecr.ap-northeast-1.amazonaws.com/[ecr-image-name]:latest
 ```
 
@@ -145,6 +145,15 @@ https://qiita.com/yoshiokaCB/private/230340c0045d0439f87a
 # 6. Pipeline登録
 
 ## 6-1. CodeCommitの作成
+
+(1) サービスから「CodeCommit」を選択し、「リポジトリ作成」をクリックしリポジトリーを作成します。（redmine_app）  
+(2) HTTPSのURLをコピーし、ローカルのredmineのリポジトリに設定し、プッシュします。
+
+```
+$ git remote add aws xxxxxxxxxxxxxxxxxxxxxxxxx
+$ git push aws aws/4.0-stable
+```
+
 
 ## 6-2. CodeBuildの作成
 
