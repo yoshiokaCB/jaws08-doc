@@ -90,7 +90,7 @@ S3_BUCKET_NAME: [bucket-name]
 上記設定が終わったら、イメージを起動して動作確認を行います。
 
 ```
-$ docker-compose up
+$ docker-compose up -d
 ```
 
 以下の `localhost:3000` へアクセスし、ログイン、プロジェクト作成、チケット作成を行い、チケット作成時にS3にファイルがアップロードされているか確認する。 （初期のログインID, Passwordは admin ）
@@ -108,7 +108,7 @@ $ docker-compose up
 **[プッシュコマンドの表示]のサンプル**
 ```
 $ $(aws ecr get-login --no-include-email --region ap-northeast-1)
-$ docker tag [image-name]:latest [aws-acount-id].dkr.ecr.ap-northeast-1.amazonaws.com/[ecr-image-name]:latest
+$ docker tag redmine_app:latest [aws-acount-id].dkr.ecr.ap-northeast-1.amazonaws.com/[ecr-image-name]:latest
 $ docker push [aws-acount-id].dkr.ecr.ap-northeast-1.amazonaws.com/[ecr-image-name]:latest
 ```
 
