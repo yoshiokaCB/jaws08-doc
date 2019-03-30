@@ -169,12 +169,15 @@ https://qiita.com/yoshiokaCB/private/5e6e392f5aeffb7aeb91
 # 7. 後始末
 
 1. CodePipelineの削除
-1. ecsのサービスの削除
+1. CodeCommitの削除
+1. ECSのサービスの削除
 1. ECSのタスクの削除
 1. ECSのクラスタの削除
 1. ALBのリスナーの削除
 1. ALBの削除
-1. ターゲットグループの削除
+1. ELBターゲットグループの削除
 1. Cloudformationのスタックの削除
+1. IAMのユーザとロールの削除
+1. CloudWatch Logの削除
 
 
